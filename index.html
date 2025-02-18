@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Me a Coffee</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>/* Styles from previous examples */
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 30px;
+        }
+
+        header img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid #eee;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            color: #222;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        /* Tiers */
+        .tiers {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .tier {
+            width: 220px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .tier:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .tier h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .tier p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .tier button {
+            background-color: #FF8138;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .tier button:hover {
+            background-color: #E67032;
+        }
+
+        .tier i {
+            margin-right: 5px;
+            font-size: 1.1em;
+        }
+
+        /* Social Links */
+        .social-links {
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #555;
+            font-size: 1.5em;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #FF8138;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        /* Form Styles */
+        #payment-form {
+            margin-top: 20px;
+            text-align: left; /* Align form elements to the left */
+        }
+
+        #payment-element {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        #payment-form button {
+            width: 100%; /* Full width button */
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #payment-form button:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 5px;
+        }
+        /* Smaller screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .tiers {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .tier {
+                width: 90%;
+            }
+
+            header img {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <img src="https://via.placeholder.com/120" alt="Your Profile">
+        <h1>Your Name</h1>
+        <p>Supporting my work with a virtual coffee is much appreciated!</p>
+
+        <div class="social-links">
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+    </header>
+
+    <section class="tiers">
+        <div class="tier">
+            <h3><i class="fas fa-coffee"></i> Mini Coffee</h3>
+            <p>A tiny boost to keep me awake.</p>
+            <button onclick="showPaymentForm(0.1)">
+                <i class="fas fa-mug-hot"></i> Buy for $0.1
+            </button>
+        </div>
+
+        <div class="tier">
+            <h3><i class="fas fa-coffee"></i> Two Coffees</h3>
+            <p>Double the boost, double the fun!</p>
+            <button onclick="showPaymentForm(0.5)">
+                <i class="fas fa-mug-hot"></i> Buy for $0.5
+            </button>
+        </div>
+
+        <div class="tier">
+            <h3><i class="fas fa-coffee"></i> Three Coffees</h3>
+            <p>Enough caffeine to conquer the world!</p>
+            <button onclick="showPaymentForm(1)">
+                <i class="fas fa-mug-hot"></i> Buy for $1
+            </button>
+        </div>
+    </section>
+
+    <!-- Payment Form -->
+    <form id="payment-form" style="display: none;">
+        <div id="payment-element">
+            <!-- Stripe.js will insert the Payment Element here -->
+        </div>
+        <button id="submit">
+            <div class="spinner hidden" id="spinner"></div>
+            <span id="button-text">Pay now</span>
+        </button>
+        <div id="payment-message" class="hidden"></div>
+        <div id="error-message" class="error-message hidden"></div>
+    </form>
+
+    <footer>
+        <p>© 2024 Your Name.  Support my work!</p>
+    </footer>
+</div>
+
+<script>
+    // Stripe initialization
+    const stripe = Stripe("YOUR_STRIPE_PUBLIC_KEY"); // Replace with your public key
+    const elements = stripe.elements();
+    const paymentElement = elements.create('payment');
+
+    let currentAmount = 0; // Store the selected coffee amount
+
+    function showPaymentForm(amount) {
+        currentAmount = amount; // Save the selected amount
+
+        const paymentForm = document.getElementById('payment-form');
+        paymentForm.style.display = 'block'; // Show the form
+
+        paymentElement.mount('#payment-element'); // Mount the element
+
+        // Listen for form submission
+        const form = document.getElementById('payment-form');
+        form.addEventListener('submit', handleSubmit);
+
+        paymentElement.on('change', (event) => {
+            const displayError = document.getElementById('error-message');
+            if (event.error) {
+                displayError.classList.remove('hidden');
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.classList.add('hidden');
+                displayError.textContent = '';
+            }
+        });
+
+    }
+
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                // Make sure to change this to your payment completion page
+                return_url: window.location.href,
+                receipt_email: 'test@example.com', // Ideally, collect this from the user.
+            },
+        });
+
+        // This point will only be reached if there is an immediate error when
+        // confirming the payment. Otherwise, your customer will be redirected to
+        // your `return_url`. For some payment methods like iDEAL, your customer will
+        // be redirected to an intermediate site first to authorize the payment, then
+        // redirected to the `return_url`.
+        if (error) {
+            // Show error to your customer (for example, payment details incomplete)
+            console.log(error.type, error.message);
+            const messageContainer = document.querySelector('#error-message');
+            messageContainer.classList.remove('hidden');
+            messageContainer.textContent = error.message;
+        } else {
+            // Your customer will be redirected to your `return_url`.
+            const messageContainer = document.querySelector('#payment-message');
+            messageContainer.classList.remove('hidden');
+            messageContainer.textContent = 'Success! Check your email for a receipt.';
+        }
+    }
+
+
+</script>
+
+</body>
+</html>
